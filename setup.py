@@ -118,18 +118,6 @@ pywin32_version = "%d.%d.%s" % (sys.version_info[0], sys.version_info[1],
                                 build_id_patch)
 print(("Building pywin32", pywin32_version))
 
-try:
-    this_file = __file__
-except NameError:
-    this_file = sys.argv[0]
-
-this_file = os.path.abspath(this_file)
-# We get upset if the cwd is not our source dir, but it is a PITA to
-# insist people manually CD there first!
-if os.path.dirname(this_file):
-    os.chdir(os.path.dirname(this_file))
-
-
 # Start address we assign base addresses from.  See comment re
 # dll_base_address later in this file...
 dll_base_address = 0x1e200000
