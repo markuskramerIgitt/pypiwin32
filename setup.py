@@ -118,10 +118,6 @@ pywin32_version = "%d.%d.%s" % (sys.version_info[0], sys.version_info[1],
                                 build_id_patch)
 print(("Building pywin32", pywin32_version))
 
-# Start address we assign base addresses from.  See comment re
-# dll_base_address later in this file...
-dll_base_address = 0x1e200000
-
 class WinExt(Extension):
     # Base class for all win32 extensions, with some predefined
     # library and include dirs, and predefined windows libraries.
@@ -147,7 +143,6 @@ class WinExt(Extension):
                  # list of headers which may not be installed forcing us to
                  # skip this extension
                  optional_headers=[],
-                 base_address=None,
                  depends=None,
                  platforms=None,  # none means 'all platforms'
                  unicode_mode=None,
@@ -176,7 +171,6 @@ class WinExt(Extension):
         self.windows_h_version = windows_h_version
         self.optional_headers = optional_headers
         self.is_regular_dll = is_regular_dll
-        self.base_address = base_address
         self.platforms = platforms
         self.implib_name = implib_name
         Extension.__init__(self, name, sources,
@@ -1101,9 +1095,8 @@ pythoncom = WinExt_system32(
     extra_compile_args=['-DBUILD_PYTHONCOM'],
     pch_header="stdafx.h",
     windows_h_version=0x500,
-    base_address=dll_base_address,
 )
-dll_base_address += 0x80000  # pythoncom is large!
+
 com_extensions = [pythoncom]
 com_extensions += [
     WinExt_win32com('adsi', libraries="ACTIVEDS ADSIID user32 advapi32",
@@ -1463,7 +1456,7 @@ pythonwin_extensions = [
                          "Pythonwin/win32win.cpp",
                      ],
                      extra_compile_args=['-DBUILD_PYW'],
-                     pch_header="stdafx.h", base_address=dll_base_address,
+                     pch_header="stdafx.h",
                      depends=[
                          "Pythonwin/stdafx.h",
                          "Pythonwin/win32uiExt.h",
@@ -1542,8 +1535,6 @@ pythonwin_extensions = [
                      depends=["win32/src/stddde.h", "pythonwin/ddemodule.h"],
                      optional_headers=['afxres.h']),
 ]
-# win32ui is large, so we reserve more bytes than normal
-dll_base_address += 0x100000
 
 other_extensions = []
 other_extensions.append(
@@ -1756,10 +1747,6 @@ ext_modules = win32_extensions + com_extensions + pythonwin_extensions + \
 # Note: If a module specifies a base address it still gets a slot reserved
 # here which is unused.  We can live with that tho.
 names = sorted([ext.name for ext in ext_modules])
-dll_base_addresses = {}
-for name in names:
-    dll_base_addresses[name] = dll_base_address
-    dll_base_address += 0x30000
 
 cmdclass = {
     'build': my_build,
