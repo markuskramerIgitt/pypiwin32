@@ -4,9 +4,9 @@ build_id = "220"  # may optionally include a ".{patchno}" suffix.
 __doc__ = """This is a distutils setup-script for the pywin32 extensions
 
 To build the pywin32 extensions, simply execute:
-  python setup2.py -q build
+  python setup.py build
 or
-  python setup2.py -q install
+  python setup.py install
 to build and install into your current Python installation.
 
 These extensions require a number of libraries to build, some of which may
@@ -36,7 +36,7 @@ Building:
 ---------
 
 To install the pywin32 extensions, execute:
-  python setup2.py -q install
+  python setup.py install
 
 This will install the built extensions into your site-packages directory,
 create an appropriate .pth file, and should leave everything ready to use.
@@ -45,9 +45,9 @@ There is no need to modify the registry.
 To build or install debug (_d) versions of these extensions, ensure you have
 built or installed a debug version of Python itself, then pass the "--debug"
 flag to the build command - eg:
-  python setup2.py -q build --debug
+  python setup.py build --debug
 or to build and install a debug version:
-  python setup2.py -q build --debug install
+  python setup.py build --debug install
 
 To build 64bit versions of this:
 
@@ -62,7 +62,7 @@ To build 64bit versions of this:
    installed with VS2008, so you may need to adjust your VS2008 setup. Then
    use:
 
-      setup2.py build --plat-name=win-amd64
+      python setup.py build --plat-name=win-amd64
 
    see the distutils cross-compilation documentation for more details.
 """
