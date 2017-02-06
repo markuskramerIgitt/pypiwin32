@@ -497,7 +497,11 @@ class build_scintilla(Command):
 class my_build_ext(build_ext):
 
     def finalize_options(self):
-        build_ext.finalize_options(self)
+        build_ext.finalize_options(self)        
+        for ext in self.extensions:
+            if isinstance(ext, WinExt_Executable):
+                ext._file_name = os.path.splitext(ext._file_name)[0]
+
         self.windows_h_version = None
         # The pywintypes library is created in the build_temp
         # directory, so we need to add this to library_dirs
@@ -544,15 +548,12 @@ class my_build_ext(build_ext):
                 self.package = ext.get_pywin32_dir()
             except AttributeError:
                 raise RuntimeError("Not a win32 package!")
-            if issubclass(type(ext), WinExt_Executable):
+            if isinstance(ext, WinExt_Executable):
                 self.compiler.link_shared_object = self._link_executable
-                self._is_executable = True
-            else:
-                self._is_executable = False
             self.build_extension(ext)
-            if issubclass(type(ext), WinExt_Executable):
+            if isinstance(ext, WinExt_Executable):
                 self.compiler.link_shared_object = link_shared_object
-            if not issubclass(type(ext), WinExt_Executable):
+            if not isinstance(ext, WinExt_Executable):
                 extra = self.debug and "_d.lib" or ".lib"
                 if ext.name in ("pywintypes", "pythoncom", "axscript"):
                     name1 = "%s%s" % (ext.name, extra)
@@ -641,17 +642,12 @@ class my_build_ext(build_ext):
         # output name is simply 'dir\name' we need to nothing.
 
         if name in ['perfmondata', 'PyISAPI_loader']:
-            nm = name + extra_dll
+            return name + extra_dll
         else:
-            nm = build_ext.get_ext_filename(self, name)
-            
-        if self._is_executable:
-            nm = os.path.splitext(nm)[0]
-        
-        return nm
+            return build_ext.get_ext_filename(self, name)
 
     def get_export_symbols(self, ext):
-        if issubclass(type(ext), WinExt_Executable):
+        if isinstance(ext, WinExt_Executable):
             return []
         elif ext.is_regular_dll:
             return ext.export_symbols
