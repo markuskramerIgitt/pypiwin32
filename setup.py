@@ -564,6 +564,9 @@ class my_build_ext(build_ext):
                 raise RuntimeError("Not a win32 package!")
             if issubclass(type(ext), WinExt_Executable):
                 self.compiler.link_shared_object = self._link_executable
+                self._is_executable = True
+            else:
+                self._is_executable = False
             self.build_extension(ext)
             if issubclass(type(ext), WinExt_Executable):
                 self.compiler.link_shared_object = link_shared_object
@@ -656,9 +659,14 @@ class my_build_ext(build_ext):
         # output name is simply 'dir\name' we need to nothing.
 
         if name in ['perfmondata', 'PyISAPI_loader']:
-            return name + extra_dll
+            nm = name + extra_dll
         else:
-            return build_ext.get_ext_filename(self, name)
+            nm = build_ext.get_ext_filename(self, name)
+            
+        if self._is_executable:
+            nm = os.path.splitext(nm)[0]
+        
+        return nm
 
     def get_export_symbols(self, ext):
         if issubclass(type(ext), WinExt_Executable):
