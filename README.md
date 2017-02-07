@@ -1,11 +1,4 @@
-[![build status][2]][3] [![Quality Gate][4]][5] [![Technical debt ratio][6]][7]
-
-[2]: https://ci.appveyor.com/api/projects/status/github/pywin32/pypiwin32?branch=master&svg=true
-[3]: https://ci.appveyor.com/project/pywin32/pypiwin32
-[4]: https://sonarqube.com/api/badges/gate?key=pywin32
-[5]: https://sonarqube.com/dashboard/index/pywin32
-[6]: https://sonarqube.com/api/badges/measure?key=pywin32&metric=sqale_debt_ratio
-[7]: https://sonarqube.com/dashboard/index/pywin32
+[![build status][2]][3] [![Quality Gate][4]][5] [![Technical debt ratio][6]][7] [![Codacy Badge][8]][9]
 
 This is the readme for the Python for Win32 (pywin32) extensions source code.
 
@@ -27,3 +20,13 @@ specific information about dependencies.  A vanilla MSVC installation should
 be able to build most extensions and list any extensions that could not be 
 built due to missing libraries - if the build actually fails with your 
 configuration, please log a bug via http://sourceforge.net/projects/pywin32.
+
+
+[2]: https://ci.appveyor.com/api/projects/status/github/pywin32/pypiwin32?branch=master&svg=true
+[3]: https://ci.appveyor.com/project/pywin32/pypiwin32
+[4]: https://sonarqube.com/api/badges/gate?key=pywin32
+[5]: https://sonarqube.com/dashboard/index/pywin32
+[6]: https://sonarqube.com/api/badges/measure?key=pywin32&metric=sqale_debt_ratio
+[7]: https://sonarqube.com/dashboard/index/pywin32
+[8]: https://api.codacy.com/project/badge/Grade/48214aa9e87d4994a41061b155a94e45
+[9]: https://www.codacy.com/app/pywin32/pypiwin32?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pywin32/pypiwin32&amp;utm_campaign=Badge_Grade
