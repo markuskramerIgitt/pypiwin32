@@ -1,4 +1,5 @@
-[![build status][2]][3] [![Quality Gate][4]][5] [![Technical debt ratio][6]][7] [![Codacy Badge][8]][9]
+[![build status][2]][3] [![Codacy Badge][8]][9] [![codecov][10]][11]
+
 
 This is the readme for the Python for Win32 (pywin32) extensions source code.
 
@@ -24,9 +25,7 @@ configuration, please log a bug via http://sourceforge.net/projects/pywin32.
 
 [2]: https://ci.appveyor.com/api/projects/status/github/pywin32/pypiwin32?branch=master&svg=true
 [3]: https://ci.appveyor.com/project/pywin32/pypiwin32
-[4]: https://sonarqube.com/api/badges/gate?key=pywin32
-[5]: https://sonarqube.com/dashboard/index/pywin32
-[6]: https://sonarqube.com/api/badges/measure?key=pywin32&metric=sqale_debt_ratio
-[7]: https://sonarqube.com/dashboard/index/pywin32
 [8]: https://api.codacy.com/project/badge/Grade/48214aa9e87d4994a41061b155a94e45
 [9]: https://www.codacy.com/app/pywin32/pypiwin32?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pywin32/pypiwin32&amp;utm_campaign=Badge_Grade
+[10]: https://codecov.io/gh/pywin32/pypiwin32/branch/master/graph/badge.svg
+[11]: https://codecov.io/gh/pywin32/pypiwin32

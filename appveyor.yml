@@ -12,8 +12,9 @@ environment:
     # /E:ON and /V:ON options are not enabled in the batch script intepreter
     # See: http://stackoverflow.com/a/13751649/163740
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\tests\\scripts\\appveyor\\run_with_env.cmd"
-    SONAR_TOKEN:
-      secure: uu1kmw00hbvZjH7/2JB3vbM1awCLXBykIOC2zzAbCVKZlEYdyXir5HGpUmvu76Ax
+    TEST_CMD: "py.test --cov=./"
+    #SONAR_TOKEN:
+    #  secure: uu1kmw00hbvZjH7/2JB3vbM1awCLXBykIOC2zzAbCVKZlEYdyXir5HGpUmvu76Ax
 
   matrix:
     - PYTHON: "C:\\Python35-x64"
@@ -23,7 +24,6 @@ environment:
       # Break the tests into two runs, since together they exceed the 1 hour limit.
       # See https://github.com/pyinstaller/pyinstaller/issues/2024#issuecomment-224129520
       # for more discussion.
-      TEST1_CMD: "py.test"
 
     - PYTHON: "C:\\Python35"
       PYTHON_VERSION: "3.5"
@@ -32,13 +32,11 @@ environment:
       # Break the tests into two runs, since together they exceed the 1 hour limit.
       # See https://github.com/pyinstaller/pyinstaller/issues/2024#issuecomment-224129520
       # for more discussion.
-      TEST1_CMD: "py.test"
 
     - PYTHON: "C:\\Python36"
       PYTHON_VERSION: "3.6"
       PYTHON_ARCH: "32"
       VCVARSALL: "x86"
-      TEST1_CMD: "py.test"
 
     - PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: "3.6"
@@ -47,7 +45,6 @@ environment:
       # Break the tests into two runs, since together they exceed the 1 hour limit.
       # See https://github.com/pyinstaller/pyinstaller/issues/2024#issuecomment-224129520
       # for more discussion.
-      TEST1_CMD: "py.test"
 
 matrix:
   fast_finish: true
@@ -61,7 +58,7 @@ init:
   - "ECHO \"%APPVEYOR_SCHEDULED_BUILD%\""
 
 install:
-  - "choco install sonarcube-scanner"
+  #- "choco install sonarcube-scanner"
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
@@ -84,10 +81,10 @@ install:
     ) ELSE (
       %CMD_IN_ENV% pip install -U --disable-pip-version-check --timeout 5 --retries 2 -r tests/requirements-win.txt )"
 
-  - "%CMD_IN_ENV% python tests/scripts/appveyor/fetch_wrapper.py"
+  #- "%CMD_IN_ENV% python tests/scripts/appveyor/fetch_wrapper.py"
   
-  - "%CMD_IN_ENV% build-wrapper-win-x86-64 --out-dir sonar python setup.py bdist_wheel"
-  - "%CMD_IN_ENV% python tests/scripts/appveyor/fixup_wrapper.py sonar/build-wrapper-dump.json"
+  - "%CMD_IN_ENV% python setup.py bdist_wheel"
+  #- "%CMD_IN_ENV% python tests/scripts/appveyor/fixup_wrapper.py sonar/build-wrapper-dump.json"
   - "%CMD_IN_ENV% python tests/scripts/install_wheels.py dist"
 
 build: none
@@ -95,7 +92,7 @@ build: none
 test_script:
   # Run the tests appropriate for this entry in the test matrix. Skip tests
   # if we're just updating the cache.
-  - "if not \"%APPVEYOR_SCHEDULED_BUILD%\" == \"True\" (%CMD_IN_ENV% %TEST1_CMD% )"
+  - "if not \"%APPVEYOR_SCHEDULED_BUILD%\" == \"True\" (%CMD_IN_ENV% %TEST_CMD% )"
 
 artifacts:
   - path: '**\*.whl'
@@ -116,6 +113,8 @@ on_success:
 
 on_finish:
   # - "python .\\tests\\scripts\\list_sitepackages.py"
+  - codecov
+
   - ps: |
       (new-object net.webclient).UploadFile(
         "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)",
@@ -123,15 +122,15 @@ on_finish:
       )
       $LastExitCode = 0
   
-  - git clean -dfx --exclude=sonar
+  #- git clean -dfx --exclude=sonar
   
-  - ps: |
-      if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
-        sonar-scanner `
-          "-Dsonar.projectKey=pywin32" `
-          "-Dsonar.sources=." `
-          "-Dsonar.host.url=https://sonarqube.com" `
-          "-Dsonar.login=%SONAR_TOKEN%" `
-          "-Dsonar.cfamily.build-wrapper-output=sonar"
-      }
-      $LastExitCode = 0
+  #- ps: |
+  #    if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
+  #      sonar-scanner `
+  #        "-Dsonar.projectKey=pywin32" `
+  #        "-Dsonar.sources=." `
+  #        "-Dsonar.host.url=https://sonarqube.com" `
+  #        "-Dsonar.login=%SONAR_TOKEN%" `
+  #        "-Dsonar.cfamily.build-wrapper-output=sonar"
+  #    }
+  #    $LastExitCode = 0
