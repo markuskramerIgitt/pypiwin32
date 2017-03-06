@@ -89,6 +89,7 @@ from distutils.core import Command
 from distutils.version import LooseVersion
 
 bdist_msi = None  # Do not build any MSI scripts
+pypiwin32_win32Only = True      # Headless (GUI-less) usage only needs win32, but not MFC.
 
 from distutils import log
 
@@ -517,7 +518,8 @@ class my_build_ext(build_ext):
 
     def run(self):
         build_ext.run(self)
-        self.run_command('build_scintilla')
+        if not pypiwin32_win32Only:
+            self.run_command('build_scintilla')
 
     def build_extensions(self):
         # First, sanity-check the 'extensions' list
@@ -940,6 +942,9 @@ win32_extensions += [
                  delay_load_libraries="powrprof",
                  windows_h_version=0x0500,
                  ),
+]
+if not pypiwin32_win32Only:
+    win32_extensions += [
     WinExt_win32("win32gui",
                  sources="""
                 win32/src/win32dynamicdialog.cpp
@@ -1732,6 +1737,9 @@ py_modules = expand_modules("win32\\lib")
 ext_modules = win32_extensions + com_extensions + pythonwin_extensions + \
               other_extensions + W32_exe_files
 
+if pypiwin32_win32Only:
+    ext_modules = win32_extensions
+
 # Build a map of DLL base addresses.  According to Python's PC\dllbase_nt.txt,
 # we start at 0x1e200000 and go up in 0x00020000 increments.  A couple of
 # our modules just go over this limit, so we use 30000.  We also do it sorted
@@ -1746,43 +1754,13 @@ cmdclass = {
     'install_data': my_install_data,
     'build_scintilla': build_scintilla, }
 
-dist = setup(name="pywin32",
-             version=str(build_id),
-             description="Python for Window Extensions",
-             long_description="Python extensions for Microsoft Windows\n"
-                              "Provides access to much of the Win32 API, the\n"
-                              "ability to create and use COM objects, and the\n"
-                              "Pythonwin environment.",
-             author="Mark Hammond (et al)",
-             author_email="mhammond@users.sourceforge.net",
-             url="http://sourceforge.net/projects/pywin32/",
-             license="PSF",
-             install_requires=['adodbapi'],
-             cmdclass=cmdclass,
-             options={"bdist_wininst":
-                          {"install_script": "pywin32_postinstall.py",
-                           "title": "pywin32-%s" % (build_id,),
-                           "user_access_control": "auto",
-                           },
-                      "bdist_msi":
-                          {"install_script": "pywin32_postinstall.py",
-                           },
-                      },
+if pypiwin32_win32Only:
+    cmdclass = {
+    'build': my_build,
+    'build_ext': my_build_ext,
+    'install_data': my_install_data }
 
-             scripts=["scripts/pywin32_postinstall.py"],
-
-             ext_modules=ext_modules,
-
-             package_dir=package_dir,
-             packages=packages,
-             py_modules=py_modules,
-             setup_requires=['setuptools>=24.0', 'cmdvars'],
-
-             data_files=[('', (os.path.join(gettempdir(), 'pywin32.version.txt'),))] +
-             convert_optional_data_files([
-                 'PyWin32.chm',
-             ]) +
-             convert_data_files([
+convert_data_files_list = [
                  'pythonwin/pywin/*.cfg',
                  'pythonwin/pywin/Demos/*.py',
                  'pythonwin/pywin/Demos/app/*.py',
@@ -1834,7 +1812,50 @@ dist = setup(name="pywin32",
                  'isapi/doc/*.html',
                  'isapi/test/*.py',
                  'isapi/test/*.txt',
+             ]
+
+if pypiwin32_win32Only:
+    convert_data_files_list = [
+                 'win32/scripts/*.py',
+    ]
+
+dist = setup(name="pywin32",
+             version=str(build_id),
+             description="Python for Window Extensions",
+             long_description="Python extensions for Microsoft Windows\n"
+                              "Provides access to much of the Win32 API, the\n"
+                              "ability to create and use COM objects, and the\n"
+                              "Pythonwin environment.",
+             author="Mark Hammond (et al)",
+             author_email="mhammond@users.sourceforge.net",
+             url="http://sourceforge.net/projects/pywin32/",
+             license="PSF",
+             install_requires=['adodbapi'],
+             cmdclass=cmdclass,
+             options={"bdist_wininst":
+                          {"install_script": "pywin32_postinstall.py",
+                           "title": "pywin32-%s" % (build_id,),
+                           "user_access_control": "auto",
+                           },
+                      "bdist_msi":
+                          {"install_script": "pywin32_postinstall.py",
+                           },
+                      },
+
+             scripts=["scripts/pywin32_postinstall.py"],
+
+             ext_modules=ext_modules,
+
+             package_dir=package_dir,
+             packages=packages,
+             py_modules=py_modules,
+             setup_requires=['setuptools>=24.0', 'cmdvars'],
+
+             data_files=[('', (os.path.join(gettempdir(), 'pywin32.version.txt'),))] +
+             convert_optional_data_files([
+                 'PyWin32.chm',
              ]) +
+             convert_data_files(convert_data_files_list) +
              # The headers and .lib files
              [
                  ('win32/include', ('win32/src/PyWinTypes.h',)),
